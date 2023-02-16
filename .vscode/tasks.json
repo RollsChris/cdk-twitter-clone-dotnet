@@ -1,0 +1,41 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/cdk.out/asset.1115ddb7fc59f382307eed32ac29cad9c9ae90485e26e36d54e1986af5ca4500/src/lambdaMinimalAPI/lambdaMinimalAPI.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/cdk.out/asset.1115ddb7fc59f382307eed32ac29cad9c9ae90485e26e36d54e1986af5ca4500/src/lambdaMinimalAPI/lambdaMinimalAPI.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "watch",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/cdk.out/asset.1115ddb7fc59f382307eed32ac29cad9c9ae90485e26e36d54e1986af5ca4500/src/lambdaMinimalAPI/lambdaMinimalAPI.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}
