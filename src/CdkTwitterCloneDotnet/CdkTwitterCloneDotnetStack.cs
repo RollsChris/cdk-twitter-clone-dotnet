@@ -19,6 +19,7 @@ namespace CdkTwitterCloneDotnet
 
             Table tweetsTable = new Table(this, $"{branchName}_tweetTable", new TableProps
             {
+                TableName=$"{branchName}_tweetTable",
                 PartitionKey = new Attribute { Name = "UserId", Type = AttributeType.STRING },
                 SortKey = new Attribute { Name = "TweetId", Type = AttributeType.STRING },
                 RemovalPolicy = RemovalPolicy.DESTROY
@@ -26,27 +27,23 @@ namespace CdkTwitterCloneDotnet
 
             Table userProfilesTable = new Table(this, $"{branchName}_userTable", new TableProps
             {
-                PartitionKey = new Attribute { Name = "id", Type = AttributeType.STRING },
+                TableName=$"{branchName}_userTable",
+                PartitionKey = new Attribute { Name = "UserId", Type = AttributeType.STRING },
                 RemovalPolicy = RemovalPolicy.DESTROY
             });
 
             IEnumerable<string> commands = new[]
             {
-                "pwd",
-                "cd ./src/lambdaMinimalApi",
-                "ls",
-                "export XDG_DATA_HOME=\"/tmp/DOTNET_CLI_HOME\"",
-                "export DOTNET_CLI_HOME=\"/tmp/DOTNET_CLI_HOME\"",
-                "export PATH=\"$PATH:/tmp/DOTNET_CLI_HOME/.dotnet/tools\"",
                 "dotnet tool install -g Amazon.Lambda.Tools",
-                "dotnet lambda package -o output.zip",
-                "unzip -o -d /asset-output output.zip",
+                "dotnet build",
+                "dotnet lambda package -o /asset-output/output.zip"
             };
 
             var assetOptions = new AssetOptions
             {
                 Bundling = new BundlingOptions
                 {
+                    User="root",
                     Image = Runtime.DOTNET_6.BundlingImage,
                     Command = new[]
                     {
@@ -58,8 +55,9 @@ namespace CdkTwitterCloneDotnet
             var lambdaFunction = new Function(this, "lambdaMinimalAPI", new FunctionProps
             {
                 Runtime = Runtime.DOTNET_6,
-                Code = Code.FromAsset("../lambdaMinimalApi",assetOptions),
-                Handler = "lambdaMinimalApi",
+                Code = Code.FromAsset("./src/lambdaMinimalApi", assetOptions),
+                
+                Handler = "lambdaMinimalAPI",
                 Environment = new Dictionary<string, string>
                 {
                     ["userProfilesTable"] = userProfilesTable.TableName,

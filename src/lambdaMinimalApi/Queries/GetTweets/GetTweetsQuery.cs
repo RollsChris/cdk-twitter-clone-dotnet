@@ -7,6 +7,11 @@ namespace lambdaMinimalApi.Queries.GetTweets
 {
     public class GetTweetsQuery : IQuery
     {
-
+        public string? UserId { get; set; }
+        public GetTweetsQuery(string? userId)
+        {
+            this.UserId = userId;
+            
+        }
     }
 }

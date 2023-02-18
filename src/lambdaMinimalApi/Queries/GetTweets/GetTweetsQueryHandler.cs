@@ -1,17 +1,47 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.Model;
 
 namespace lambdaMinimalApi.Queries.GetTweets
 {
+    public class ScanResult
+    {
+        public int Count { get; set; }
+        public int ScannedCount { get; set; }
+        public List<Tweets> Items { get; set; }
+    }
     public class GetTweetsQueryHandler : IGetTweetsQueryHandler
     {
-        public async Task<List<string>> Handle(GetTweetsQuery query)
+        public IAmazonDynamoDB _dBContext { get; }
+        public GetTweetsQueryHandler(IAmazonDynamoDB dBContext)
         {
-            return new List<string>
+            _dBContext = dBContext;
+
+        }
+        public async Task<ScanResult> Handle(GetTweetsQuery query)
+        {
+            string tweetsTable = Environment.GetEnvironmentVariable("tweetsTable");
+
+
+            var request = new ScanRequest
             {
-                ""
+                TableName = tweetsTable,
+                ProjectionExpression = "UserId, Tweet, TweetId, CreatedDate"
+            };
+            var response = await this._dBContext.ScanAsync(request);
+            return new ScanResult {
+                Count = response.Count,
+                ScannedCount = response.ScannedCount,
+                Items = response.Items.Select(i => new Tweets{
+                        UserId = i["UserId"].S,
+                        Tweet = i["Tweet"].S,
+                        CreatedDate = i["CreatedDate"].S,
+                        TweetId = i["TweetId"].S
+                }).ToList()
             };
         }
     }
