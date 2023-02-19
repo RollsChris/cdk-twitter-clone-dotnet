@@ -15,20 +15,33 @@ namespace CdkTwitterCloneDotnet
         {
             // The code that defines your stack goes here
             // Bucket bucket = new Bucket(this, "MyFirstBucket");
-            var branchName = scope.Node.TryGetContext("branch") ?? "CdkTwitterCloneDotnetStack";
-
-            Table tweetsTable = new Table(this, $"{branchName}_tweetTable", new TableProps
+            var branchName = scope.Node.TryGetContext("branch") ?? "CdkDotNet";
+            var tweetTableName = $"{branchName}_tweetTable";
+            var userTableName = $"{branchName}_userTable";
+            Table tweetsTable = new Table(this, tweetTableName, new TableProps
             {
-                TableName=$"{branchName}_tweetTable",
-                PartitionKey = new Attribute { Name = "UserId", Type = AttributeType.STRING },
-                SortKey = new Attribute { Name = "TweetId", Type = AttributeType.STRING },
+                TableName = tweetTableName,
+                PartitionKey = new Attribute
+                {
+                    Name = "UserId",
+                    Type = AttributeType.STRING
+                },
+                SortKey = new Attribute
+                {
+                    Name = "TweetId",
+                    Type = AttributeType.STRING
+                },
                 RemovalPolicy = RemovalPolicy.DESTROY
             });
 
-            Table userProfilesTable = new Table(this, $"{branchName}_userTable", new TableProps
+            Table userProfilesTable = new Table(this, userTableName, new TableProps
             {
-                TableName=$"{branchName}_userTable",
-                PartitionKey = new Attribute { Name = "UserId", Type = AttributeType.STRING },
+                TableName = userTableName,
+                PartitionKey = new Attribute
+                {
+                    Name = "UserId",
+                    Type = AttributeType.STRING
+                },
                 RemovalPolicy = RemovalPolicy.DESTROY
             });
 
@@ -43,7 +56,7 @@ namespace CdkTwitterCloneDotnet
             {
                 Bundling = new BundlingOptions
                 {
-                    User="root",
+                    User = "root",
                     Image = Runtime.DOTNET_6.BundlingImage,
                     Command = new[]
                     {
@@ -51,12 +64,11 @@ namespace CdkTwitterCloneDotnet
                     }
                 }
             };
-            
+
             var lambdaFunction = new Function(this, "lambdaMinimalAPI", new FunctionProps
             {
                 Runtime = Runtime.DOTNET_6,
                 Code = Code.FromAsset("./src/lambdaMinimalApi", assetOptions),
-                
                 Handler = "lambdaMinimalAPI",
                 Environment = new Dictionary<string, string>
                 {
@@ -74,7 +86,7 @@ namespace CdkTwitterCloneDotnet
             });
 
             userProfilesTable.GrantFullAccess(lambdaFunction);
-            
+
             tweetsTable.GrantFullAccess(lambdaFunction);
 
             new CfnOutput(this, "FunctionOutput", new CfnOutputProps

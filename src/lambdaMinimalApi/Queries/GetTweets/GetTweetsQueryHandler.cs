@@ -8,12 +8,6 @@ using Amazon.DynamoDBv2.Model;
 
 namespace lambdaMinimalApi.Queries.GetTweets
 {
-    public class ScanResult
-    {
-        public int Count { get; set; }
-        public int ScannedCount { get; set; }
-        public List<Tweets> Items { get; set; }
-    }
     public class GetTweetsQueryHandler : IGetTweetsQueryHandler
     {
         public IAmazonDynamoDB _dBContext { get; }
@@ -26,13 +20,14 @@ namespace lambdaMinimalApi.Queries.GetTweets
         {
             string tweetsTable = Environment.GetEnvironmentVariable("tweetsTable");
 
-
             var request = new ScanRequest
             {
                 TableName = tweetsTable,
                 ProjectionExpression = "UserId, Tweet, TweetId, CreatedDate"
             };
+
             var response = await this._dBContext.ScanAsync(request);
+
             return new ScanResult {
                 Count = response.Count,
                 ScannedCount = response.ScannedCount,
